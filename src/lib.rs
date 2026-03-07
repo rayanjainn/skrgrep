@@ -3,12 +3,10 @@ use clap::Parser; // Parser trait for CLI derivation
 use rayon::prelude::*; // Rayon traits for parallel iterators
 use walkdir::WalkDir; // WalkDir for recursive directory traversal
 
-// CLI color codes
 const RED: &str = "\x1b[1;31m";
 const GREEN: &str = "\x1b[32m";
 const RESET: &str = "\x1b[0m";
 
-/// skrgrep: A fast, multi-threaded grep implementation in Rust.
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 pub struct Config {
