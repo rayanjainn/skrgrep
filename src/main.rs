@@ -1,9 +1,9 @@
-use std::{env, error::Error, fs, process};
+use std::{env, error::Error, path::{PathBuf}, process};
 use minigrep::{search, search_case_insensitive};
 
 struct Config {
     query: String,
-    file_path: String,
+    path: PathBuf,
     ignore_case: bool,
 }
 
@@ -13,26 +13,19 @@ impl Config {
             return Err("not enough arguments");
         }
         let query = args[1].clone();
-        let file_path = args[2].clone();
+        let path = PathBuf::from(&args[2]);
 
         let ignore_case = env::var("IGNORE_CASE").is_ok();
-        Ok(Config { query, file_path, ignore_case })
+        Ok(Config { query, path, ignore_case })
     }
 }
 
 fn run (config: Config) -> Result<(), Box<dyn Error>>{
-    let content = fs::read_to_string(config.file_path)?;
-
-    let results = if config.ignore_case {
-        search_case_insensitive(&config.query, &content)
+    if config.ignore_case {
+        search_case_insensitive(&config.query, &config.path)
     } else {
-        search(&config.query, &content)
+        search(&config.query, &config.path)
     };
-
-    for line in results {
-        println!("{}", line);
-    }
-    
     Ok(())
 }
 
@@ -47,9 +40,6 @@ fn main() {
         }
     };
     
-    println!("Searching for {}", config.query);
-    println!("In file {}", config.file_path);
-
     if let Err(e) = run(config) {
         println!("Application error: {}", e);
         process::exit(1);
